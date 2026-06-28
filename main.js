@@ -64,22 +64,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     musicToggle.addEventListener('click', () => {
         if (isMusicPlaying) {
+            // Pause music
             bgMusic.pause();
             musicToggle.textContent = '🔇';
+            isMusicPlaying = false;
+            console.log('Music paused');
         } else {
+            // Try to play music
+            bgMusic.volume = 0.5;
             if (!audioLoaded) {
                 console.log('Audio not fully loaded yet, trying to play...');
             }
             bgMusic.play()
                 .then(() => {
-                    console.log('Audio playing successfully');
+                    console.log('Music playing successfully');
                     musicToggle.textContent = '🔊';
+                    isMusicPlaying = true;
                 })
                 .catch(err => {
-                    console.error('Failed to play audio:', err);
+                    console.error('Failed to play music:', err);
+                    // Keep isMusicPlaying as false if failed to play
                 });
         }
-        isMusicPlaying = !isMusicPlaying;
     });
     
     // Play music when user clicks Yes button
