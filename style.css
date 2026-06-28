@@ -6,11 +6,48 @@
 
 body {
     font-family: 'Georgia', serif;
-    background: linear-gradient(135deg, #2a0f1c 0%, #4a1030 50%, #2a0f1c 100%);
+    background: linear-gradient(-45deg, #2a0f1c, #4a1030, #6b1a4a, #4a1030, #2a0f1c);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     min-height: 100vh;
     overflow: hidden;
     margin: 0;
     padding: 0;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.pulsing-heart {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 15rem;
+    color: rgba(255, 71, 126, 0.1);
+    animation: pulse 3s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.2;
+    }
 }
 
 #starsCanvas {
