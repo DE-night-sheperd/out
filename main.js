@@ -14,12 +14,64 @@ let mouseX = 0;
 let mouseY = 0;
 let hearts = [];
 
+function goToStep(stepNumber) {
+    document.getElementById(`step${currentStep}`).classList.add('hidden');
+    currentStep = stepNumber;
+    const nextStep = document.getElementById(`step${currentStep}`);
+    nextStep.classList.remove('hidden');
+    
+    // Re-trigger animation
+    nextStep.style.animation = 'none';
+    nextStep.offsetHeight; // Trigger reflow
+    nextStep.style.animation = 'modalIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    
+    if (currentStep === 2) {
+        setTimeout(() => {
+            if (flatpickrInstance) {
+                flatpickrInstance.open();
+            }
+        }, 300);
+    } else if (currentStep === 6) {
+        updateSummary();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initNoButton();
     initDatePicker();
     initAnalogClock();
     initStarsCanvas();
     animateStars();
+    
+    // Music setup
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggle = document.getElementById('musicToggle');
+    let isMusicPlaying = false;
+    
+    musicToggle.addEventListener('click', () => {
+        if (isMusicPlaying) {
+            bgMusic.pause();
+            musicToggle.textContent = '🔇';
+        } else {
+            bgMusic.play().catch(err => console.log('Audio play failed:', err));
+            musicToggle.textContent = '🔊';
+        }
+        isMusicPlaying = !isMusicPlaying;
+    });
+    
+    // Play music when user clicks Yes (goes to step 2)
+    // We'll override goToStep or add a listener to step change
+    // Let's modify goToStep
+    const originalGoToStep = goToStep;
+    goToStep = function(stepNumber) {
+        if (stepNumber === 2 && !isMusicPlaying) {
+            bgMusic.play().then(() => {
+                isMusicPlaying = true;
+                musicToggle.textContent = '🔊';
+            }).catch(err => console.log('Audio play failed:', err));
+        }
+        originalGoToStep(stepNumber);
+    };
 });
 
 function initNoButton() {
@@ -162,28 +214,6 @@ function initAnalogClock() {
 function confirmTime() {
     responses.time = `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
     goToStep(4);
-}
-
-function goToStep(stepNumber) {
-    document.getElementById(`step${currentStep}`).classList.add('hidden');
-    currentStep = stepNumber;
-    const nextStep = document.getElementById(`step${currentStep}`);
-    nextStep.classList.remove('hidden');
-    
-    // Re-trigger animation
-    nextStep.style.animation = 'none';
-    nextStep.offsetHeight; // Trigger reflow
-    nextStep.style.animation = 'modalIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-    
-    if (currentStep === 2) {
-        setTimeout(() => {
-            if (flatpickrInstance) {
-                flatpickrInstance.open();
-            }
-        }, 300);
-    } else if (currentStep === 6) {
-        updateSummary();
-    }
 }
 
 function selectTheme(theme) {
