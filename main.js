@@ -281,27 +281,34 @@ function updateSummary() {
     summaryDiv.innerHTML = buildSummaryHTML();
 }
 
-async function confirmAndSave() {
-    try {
-        const res = await fetch('http://localhost:3001/api/save-response', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(responses)
-        });
-        
-        const data = await res.json();
-        if (data.id) {
-            const finalSummaryDiv = document.getElementById('final-summary');
-            finalSummaryDiv.innerHTML = buildSummaryHTML();
-            finalSummaryDiv.style.cssText = 'background: #fff5f5; padding: 25px; border-radius: 14px; text-align: left;';
-            goToStep(8);
-        }
-    } catch (error) {
-        console.error('Error saving response:', error);
-        alert('Something went wrong! Please try again.');
-    }
+function confirmAndSave() {
+    // Populate final plan details
+    const finalPlanDetails = document.getElementById('finalPlanDetails');
+    finalPlanDetails.innerHTML = buildSummaryHTML();
+    
+    // Go to step 8
+    goToStep(8);
+    
+    // Add download button listener
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.onclick = downloadDatePlan;
+}
+
+function downloadDatePlan() {
+    const card = document.getElementById('datePlanCard');
+    html2canvas(card, {
+        scale: 2, // Higher scale for better quality
+        backgroundColor: '#fff5f5',
+        useCORS: true
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'perfect-date-plan.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }).catch(err => {
+        console.error('Failed to generate image:', err);
+        alert('Failed to download, please take a screenshot!');
+    });
 }
 
 function displayQRCode(url) {
