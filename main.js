@@ -59,19 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
         isMusicPlaying = !isMusicPlaying;
     });
     
-    // Play music when user clicks Yes (goes to step 2)
-    // We'll override goToStep or add a listener to step change
-    // Let's modify goToStep
-    const originalGoToStep = goToStep;
-    goToStep = function(stepNumber) {
-        if (stepNumber === 2 && !isMusicPlaying) {
-            bgMusic.play().then(() => {
-                isMusicPlaying = true;
-                musicToggle.textContent = '🔊';
-            }).catch(err => console.log('Audio play failed:', err));
-        }
-        originalGoToStep(stepNumber);
-    };
+    // Play music when user clicks Yes button
+    const yesButton = document.querySelector('.yes-button');
+    yesButton.addEventListener('click', () => {
+        bgMusic.volume = 0.5;
+        bgMusic.play().then(() => {
+            isMusicPlaying = true;
+            musicToggle.textContent = '🔊';
+        }).catch(err => console.log('Audio play failed:', err));
+    });
 });
 
 function initNoButton() {
@@ -296,23 +292,17 @@ function confirmAndSave() {
 
 function downloadDatePlan() {
     const card = document.getElementById('datePlanCard');
-    // Make sure it's visible and has layout
-    card.style.display = 'block';
-    card.style.opacity = '1';
-    card.style.position = 'relative';
     
     html2canvas(card, {
-        scale: 3,
+        scale: 1, // Exactly as on screen
         backgroundColor: '#fff5f5',
         useCORS: true,
-        logging: false,
         allowTaint: true,
-        imageTimeout: 0,
-        removeContainer: true
+        logging: true
     }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'our-perfect-date-plan.png';
-        link.href = canvas.toDataURL('image/png', 1.0);
+        link.href = canvas.toDataURL('image/png');
         link.click();
     }).catch(err => {
         console.error('Failed to generate image:', err);
