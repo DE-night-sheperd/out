@@ -278,36 +278,10 @@ function updateSummary() {
 }
 
 function confirmAndSave() {
-    // Populate final plan details
-    const finalPlanDetails = document.getElementById('finalPlanDetails');
-    finalPlanDetails.innerHTML = buildSummaryHTML();
-    
-    // Go to step 8
+    const finalSummaryDiv = document.getElementById('final-summary');
+    finalSummaryDiv.innerHTML = buildSummaryHTML();
+    finalSummaryDiv.style.cssText = 'background: #fff5f5; padding: 25px; border-radius: 14px; text-align: left;';
     goToStep(8);
-    
-    // Add download button listener
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.onclick = downloadDatePlan;
-}
-
-function downloadDatePlan() {
-    const card = document.getElementById('datePlanCard');
-    
-    html2canvas(card, {
-        scale: 1, // Exactly as on screen
-        backgroundColor: '#fff5f5',
-        useCORS: true,
-        allowTaint: true,
-        logging: true
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'our-perfect-date-plan.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    }).catch(err => {
-        console.error('Failed to generate image:', err);
-        alert('Failed to download, please take a screenshot!');
-    });
 }
 
 function displayQRCode(url) {

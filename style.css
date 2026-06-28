@@ -71,35 +71,6 @@ body {
     transform: scale(1.1);
 }
 
-.date-plan-card {
-    background: linear-gradient(135deg, #fff5f5, #ffe4e9);
-    padding: 40px;
-    border-radius: 20px;
-    border: 3px solid #ff6b9d;
-    text-align: center;
-    width: 500px;
-    max-width: 100%;
-    color: #333;
-    box-sizing: border-box;
-}
-
-.date-plan-card h2 {
-    font-size: 1.8rem;
-    margin: 0 0 25px 0;
-}
-
-.date-plan-card p {
-    margin: 15px 0;
-    color: #333;
-    font-size: 1.2rem;
-    line-height: 1.5;
-}
-
-.date-plan-card strong {
-    color: #ff477e;
-    font-weight: bold;
-}
-
 #starsCanvas {
     position: fixed;
     top: 0;
