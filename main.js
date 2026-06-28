@@ -47,14 +47,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgMusic = document.getElementById('bgMusic');
     const musicToggle = document.getElementById('musicToggle');
     let isMusicPlaying = false;
-    
+    let audioLoaded = false;
+
+    // Check if audio is ready
+    bgMusic.addEventListener('canplay', () => {
+        console.log('Audio loaded and ready to play');
+        audioLoaded = true;
+    });
+
+    // Handle audio errors
+    bgMusic.addEventListener('error', (e) => {
+        console.log('Audio error:', e);
+        console.log('Error code:', bgMusic.error?.code);
+        console.log('Error message:', bgMusic.error?.message);
+    });
+
     musicToggle.addEventListener('click', () => {
         if (isMusicPlaying) {
             bgMusic.pause();
             musicToggle.textContent = '🔇';
         } else {
-            bgMusic.play().catch(err => console.log('Audio play failed:', err));
-            musicToggle.textContent = '🔊';
+            if (!audioLoaded) {
+                console.log('Audio not fully loaded yet, trying to play...');
+            }
+            bgMusic.play()
+                .then(() => {
+                    console.log('Audio playing successfully');
+                    musicToggle.textContent = '🔊';
+                })
+                .catch(err => {
+                    console.error('Failed to play audio:', err);
+                });
         }
         isMusicPlaying = !isMusicPlaying;
     });
@@ -63,10 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const yesButton = document.querySelector('.yes-button');
     yesButton.addEventListener('click', () => {
         bgMusic.volume = 0.5;
-        bgMusic.play().then(() => {
-            isMusicPlaying = true;
-            musicToggle.textContent = '🔊';
-        }).catch(err => console.log('Audio play failed:', err));
+        bgMusic.play()
+            .then(() => {
+                isMusicPlaying = true;
+                musicToggle.textContent = '🔊';
+                console.log('Audio started from Yes button');
+            })
+            .catch(err => {
+                console.error('Failed to start audio from Yes button:', err);
+            });
     });
 });
 
