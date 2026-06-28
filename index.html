@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Perfect Date 💕</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <canvas id="starsCanvas"></canvas>
+    <div class="steps-overlay">
+        <!-- Step 1: Proposal -->
+        <div class="modal-window" id="step1">
+            <div class="modal-content">
+                <h1>Will you go out with me? 💕</h1>
+                <div class="buttons-container">
+                    <button class="yes-button" onclick="goToStep(2)">Yes! 🥰</button>
+                    <button class="no-button" id="noButton">No 🙅</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Date Picker -->
+        <div class="modal-window hidden" id="step2">
+            <div class="modal-content">
+                <h1>Pick a date! 📅</h1>
+                <div class="date-picker-container">
+                    <input type="text" id="datePicker" class="date-picker" placeholder="Click to select a date">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Time Picker -->
+        <div class="modal-window hidden" id="step3">
+            <div class="modal-content">
+                <h1>Choose a time! ⏰</h1>
+                <div class="clock-container">
+                    <div class="clock" id="clock">
+                        <div class="clock-face">
+                            <div class="clock-center"></div>
+                            <div class="hour-hand" id="hourHand"></div>
+                            <div class="minute-hand" id="minuteHand"></div>
+                            <div class="clock-number" style="--angle: 270deg; --text: '12'"></div>
+                            <div class="clock-number" style="--angle: 300deg; --text: '1'"></div>
+                            <div class="clock-number" style="--angle: 330deg; --text: '2'"></div>
+                            <div class="clock-number" style="--angle: 0deg; --text: '3'"></div>
+                            <div class="clock-number" style="--angle: 30deg; --text: '4'"></div>
+                            <div class="clock-number" style="--angle: 60deg; --text: '5'"></div>
+                            <div class="clock-number" style="--angle: 90deg; --text: '6'"></div>
+                            <div class="clock-number" style="--angle: 120deg; --text: '7'"></div>
+                            <div class="clock-number" style="--angle: 150deg; --text: '8'"></div>
+                            <div class="clock-number" style="--angle: 180deg; --text: '9'"></div>
+                            <div class="clock-number" style="--angle: 210deg; --text: '10'"></div>
+                            <div class="clock-number" style="--angle: 240deg; --text: '11'"></div>
+                        </div>
+                    </div>
+                    <div class="selected-time" id="selectedTime">7:00 PM</div>
+                    <button onclick="confirmTime()">Confirm Time ✅</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Theme Picker -->
+        <div class="modal-window hidden" id="step4">
+            <div class="modal-content">
+                <h1>Pick a vibe! 🎨</h1>
+                <div class="theme-cards">
+                    <div class="theme-card" onclick="selectTheme('campus_coffee')">
+                        <div class="theme-image campus_coffee"></div>
+                        <h3>☕ Campus Coffee</h3>
+                        <p>Coffee shop catch-up, study dates</p>
+                    </div>
+                    <div class="theme-card" onclick="selectTheme('movie_night')">
+                        <div class="theme-image movie_night"></div>
+                        <h3>🎬 Movie Night</h3>
+                        <p>Netflix binge, cinema trip</p>
+                    </div>
+                    <div class="theme-card" onclick="selectTheme('food_run')">
+                        <div class="theme-image food_run"></div>
+                        <h3>🍔 Food Run</h3>
+                        <p>Takeaway, late-night snacks</p>
+                    </div>
+                    <div class="theme-card" onclick="selectTheme('late_night_walk')">
+                        <div class="theme-image late_night_walk"></div>
+                        <h3>🌙 Late Night Walk</h3>
+                        <p>Campus stroll, night talks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Dietary Preferences & Cuisines -->
+        <div class="modal-window hidden" id="step5">
+            <div class="modal-content">
+                <h1>Dietary Preferences & Cuisines 🍴</h1>
+                <div class="dietary-options">
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="italian"> Italian</label>
+                        <label><input type="checkbox" value="sushi"> Sushi</label>
+                        <label><input type="checkbox" value="skopo"> Skopo</label>
+                        <label><input type="checkbox" value="pizza"> Pizza</label>
+                        <label><input type="checkbox" value="grapes"> Grapes</label>
+                        <label><input type="checkbox" value="fruits"> Fruits</label>
+                        <label><input type="checkbox" value="braai"> Braai</label>
+                        <label><input type="checkbox" value="kota"> Kota</label>
+                        <label><input type="checkbox" value="chips"> Chips</label>
+                    </div>
+                    <h3>Allergies/Restrictions:</h3>
+                    <input type="text" id="dietaryRestrictions" placeholder="e.g., nuts, dairy, gluten-free">
+                </div>
+                <button onclick="goToStep(6)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 6: Snacks -->
+        <div class="modal-window hidden" id="step6">
+            <div class="modal-content">
+                <h1>Pick your snacks! 🍬</h1>
+                <div class="dietary-options">
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="zimbas"> Zimbas</label>
+                        <label><input type="checkbox" value="sweets"> Sweets</label>
+                        <label><input type="checkbox" value="gummies"> Gummies</label>
+                        <label><input type="checkbox" value="fruits_snacks"> Fruits</label>
+                        <label><input type="checkbox" value="biscuits"> Biscuits</label>
+                        <label><input type="checkbox" value="chocolate"> Chocolate</label>
+                    </div>
+                </div>
+                <button onclick="goToStep(7)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 7: Confirmation -->
+        <div class="modal-window hidden" id="step7">
+            <div class="modal-content">
+                <h1>Confirm your choices ✨</h1>
+                <div id="summary"></div>
+                <button onclick="confirmAndSave()">Confirm & Save</button>
+            </div>
+        </div>
+
+        <!-- Step 8: Final Screen -->
+        <div class="modal-window hidden" id="step8">
+            <div class="modal-content">
+                <h1>Perfect! ✨</h1>
+                <p style="font-size: 1.2rem; margin-bottom: 20px; color: #ff6b6b;">CAN YOU PLEASE SEND ME THE SCREENSHOT OF THESE RESULTS</p>
+                <div id="final-summary"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js?v=6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js?v=6"></script>
+    <script src="main.js?v=6"></script>
+</body>
+</html>

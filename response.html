@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Date Itinerary 💕</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a0a14 0%, #2d102a 50%, #1a0a14 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        #starsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: auto;
+        }
+        
+        .dashboard {
+            display: grid;
+            gap: 20px;
+        }
+        .card {
+            background: #fff5f5;
+            padding: 25px;
+            border-radius: 14px;
+            text-align: left;
+            animation: cardIn 0.5s ease-out;
+        }
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card h3 {
+            color: #ff6b6b;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        .card p {
+            color: #444;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starsCanvas"></canvas>
+    <div class="steps-overlay">
+        <div class="modal-window" id="itineraryModal">
+            <div class="modal-content">
+                <h1>Our Date Itinerary 💕</h1>
+                <div id="dashboard" class="dashboard">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Star state
+        let stars = [];
+        let mouseX = 0;
+        let mouseY = 0;
+        let hearts = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initStarsCanvas();
+            animateStars();
+            loadResponse();
+        });
+        
+        function initStarsCanvas() {
+            const canvas = document.getElementById('starsCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            for (let i = 0; i < 300; i++) {
+                stars.push(createStar());
+            }
+            
+            hearts = [
+                { x: canvas.width * 0.2, y: canvas.height * 0.3 },
+                { x: canvas.width * 0.8, y: canvas.height * 0.3 },
+                { x: canvas.width * 0.5, y: canvas.height * 0.7 }
+            ];
+            
+            canvas.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    mouseX = e.touches[0].clientX;
+                    mouseY = e.touches[0].clientY;
+                }
+            });
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                hearts = [
+                    { x: canvas.width * 0.2, y: canvas.height * 0.3 },
+                    { x: canvas.width * 0.8, y: canvas.height * 0.3 },
+                    { x: canvas.width * 0.5, y: canvas.height * 0.7 }
+                ];
+            });
+        }
+        
+        function createStar() {
+            return {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 3 + 1,
+                targetX: Math.random() * window.innerWidth,
+                targetY: Math.random() * window.innerHeight,
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: (Math.random() - 0.5) * 2,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.1,
+                color: getRandomPinkColor(),
+                pulseSpeed: Math.random() * 0.02 + 0.01,
+                pulsePhase: Math.random() * Math.PI * 2,
+                roots: [],
+                rootLength: 15 + Math.random() * 30,
+                rootSegments: 3 + Math.floor(Math.random() * 4),
+                morphLevel: 0,
+                morphSpeed: 0.02 + Math.random() * 0.03
+            };
+        }
+        
+        function getRandomPinkColor() {
+            const colors = [
+                '#ff6b9d',
+                '#ff8fa3',
+                '#ffb3c1',
+                '#ffccd5',
+                '#fff0f3',
+                '#ff477e',
+                '#ff85a2'
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        function getHeartPosition(scale, t) {
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            return { x: x * scale, y: y * scale };
+        }
+        
+        function animateStars() {
+            const canvas = document.getElementById('starsCanvas');
+            const ctx = canvas.getContext('2d');
+            let time = 0;
+            
+            function draw() {
+                time += 0.005;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                stars.forEach((star, index) => {
+                    let nearestHeart = hearts[0];
+                    let minDist = Infinity;
+                    hearts.forEach(h => {
+                        const dist = Math.hypot(star.x - h.x, star.y - h.y);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            nearestHeart = h;
+                        }
+                    });
+                    
+                    const starIndex = index % 100;
+                    const t = (starIndex / 100) * Math.PI * 2 + time;
+                    const heartPos = getHeartPosition(20, t);
+                    star.targetX = nearestHeart.x + heartPos.x;
+                    star.targetY = nearestHeart.y + heartPos.y;
+                    
+                    const mouseDist = Math.hypot(star.x - mouseX, star.y - mouseY);
+                    if (mouseDist < 200) {
+                        star.targetX = mouseX + (Math.random() - 0.5) * 120;
+                        star.targetY = mouseY + (Math.random() - 0.5) * 120;
+                        star.morphLevel = Math.min(1, star.morphLevel + 0.05);
+                    } else {
+                        star.morphLevel = Math.max(0, star.morphLevel - 0.02);
+                    }
+                    
+                    star.x += (star.targetX - star.x) * 0.05;
+                    star.y += (star.targetY - star.y) * 0.05;
+                    star.rotation += star.rotationSpeed;
+                    
+                    const pulse = Math.sin(time * 10 + star.pulsePhase) * 0.3 + 0.7;
+                    const currentSize = star.size * pulse;
+                    
+                    drawRoots(ctx, star, time);
+                    
+                    ctx.save();
+                    ctx.translate(star.x, star.y);
+                    ctx.rotate(star.rotation);
+                    if (star.morphLevel > 0.01) {
+                        drawMorphingHeartStar(ctx, 0, 0, 5, currentSize, currentSize * 0.5, star.color, star.morphLevel);
+                    } else {
+                        drawStarShape(ctx, 0, 0, 5, currentSize, currentSize * 0.5, star.color);
+                    }
+                    ctx.restore();
+                });
+                
+                requestAnimationFrame(draw);
+            }
+            
+            draw();
+        }
+        
+        function drawRoots(ctx, star, time) {
+            ctx.save();
+            ctx.strokeStyle = star.color;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.5;
+            
+            let prevX = star.x;
+            let prevY = star.y;
+            
+            for (let i = 0; i < star.rootSegments; i++) {
+                const angle = (i / star.rootSegments) * Math.PI * 2 + time * 0.5;
+                const length = (star.rootLength / star.rootSegments) * (i + 1);
+                const x = prevX + Math.cos(angle) * length * 0.3;
+                const y = prevY + Math.sin(angle) * length * 0.3;
+                
+                ctx.beginPath();
+                ctx.moveTo(prevX, prevY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                prevX = x;
+                prevY = y;
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawMorphingHeartStar(ctx, cx, cy, spikes, outerRadius, innerRadius, color, t) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+            
+            ctx.beginPath();
+            
+            let starX = cx;
+            let starY = cy - outerRadius;
+            let heartParam = Math.PI / 2;
+            let heartX = cx + 16 * Math.pow(Math.sin(heartParam), 3) * (outerRadius / 40);
+            let heartY = cy - (13 * Math.cos(heartParam) - 5 * Math.cos(2 * heartParam) - 2 * Math.cos(3 * heartParam) - Math.cos(4 * heartParam)) * (outerRadius / 40);
+            let finalX = starX + (heartX - starX) * t;
+            let finalY = starY + (heartY - starY) * t;
+            ctx.moveTo(finalX, finalY);
+            
+            for (let i = 0; i < spikes; i++) {
+                starX = cx + Math.cos(rot) * outerRadius;
+                starY = cy + Math.sin(rot) * outerRadius;
+                
+                heartParam = Math.PI / 2 + (i / spikes) * Math.PI * 2;
+                heartX = cx + 16 * Math.pow(Math.sin(heartParam), 3) * (outerRadius / 40);
+                heartY = cy - (13 * Math.cos(heartParam) - 5 * Math.cos(2 * heartParam) - 2 * Math.cos(3 * heartParam) - Math.cos(4 * heartParam)) * (outerRadius / 40);
+                finalX = starX + (heartX - starX) * t;
+                finalY = starY + (heartY - starY) * t;
+                ctx.lineTo(finalX, finalY);
+                
+                rot += step;
+                
+                starX = cx + Math.cos(rot) * innerRadius;
+                starY = cy + Math.sin(rot) * innerRadius;
+                
+                heartParam = Math.PI / 2 + (i / spikes) * Math.PI * 2 + Math.PI / spikes;
+                heartX = cx + 16 * Math.pow(Math.sin(heartParam), 3) * (innerRadius / 20);
+                heartY = cy - (13 * Math.cos(heartParam) - 5 * Math.cos(2 * heartParam) - 2 * Math.cos(3 * heartParam) - Math.cos(4 * heartParam)) * (innerRadius / 20);
+                finalX = starX + (heartX - starX) * t;
+                finalY = starY + (heartY - starY) * t;
+                ctx.lineTo(finalX, finalY);
+                
+                rot += step;
+            }
+            
+            starX = cx;
+            starY = cy - outerRadius;
+            heartParam = Math.PI / 2;
+            heartX = cx + 16 * Math.pow(Math.sin(heartParam), 3) * (outerRadius / 40);
+            heartY = cy - (13 * Math.cos(heartParam) - 5 * Math.cos(2 * heartParam) - 2 * Math.cos(3 * heartParam) - Math.cos(4 * heartParam)) * (outerRadius / 40);
+            finalX = starX + (heartX - starX) * t;
+            finalY = starY + (heartY - starY) * t;
+            ctx.lineTo(finalX, finalY);
+            
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = color;
+        }
+        
+        function drawStarShape(ctx, cx, cy, spikes, outerRadius, innerRadius, color) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = color;
+        }
+        
+        async function loadResponse() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            
+            if (!id) {
+                document.getElementById('dashboard').innerHTML = '<p>Invalid URL - missing ID parameter.</p>';
+                return;
+            }
+            
+            try {
+                const res = await fetch(`http://localhost:3001/api/get-response?id=${id}`);
+                const data = await res.json();
+                
+                if (data.error) {
+                    document.getElementById('dashboard').innerHTML = `<p>Error: ${data.error}</p>`;
+                    return;
+                }
+                
+                const themeNames = {
+                    'elegant': '🥂 Elegant/Formal',
+                    'casual': '🍿 Casual/Cozy',
+                    'adventure': '🌲 Adventure/Outdoor'
+                };
+
+                let formattedTime = data.time;
+                if (data.time) {
+                    const [hours, minutes] = data.time.split(':');
+                    const hourNum = parseInt(hours);
+                    const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
+                    const period = hourNum < 12 ? 'AM' : 'PM';
+                    formattedTime = `${displayHour}:${minutes} ${period}`;
+                }
+                
+                document.getElementById('dashboard').innerHTML = `
+                    <div class="card">
+                        <h3>Date 📅</h3>
+                        <p>${data.date}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Time ⏰</h3>
+                        <p>${formattedTime}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Theme 🎨</h3>
+                        <p>${themeNames[data.theme] || data.theme}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Cuisines 🍴</h3>
+                        <p>${data.cuisines && data.cuisines.length > 0 ? data.cuisines.join(', ') : 'Any'}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Dietary Restrictions 🚨</h3>
+                        <p>${data.restrictions || 'None'}</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading response:', error);
+                document.getElementById('dashboard').innerHTML = '<p>Failed to load itinerary. Please try again later.</p>';
+            }
+        }
+        
+        loadResponse();
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "date-proposal-app",
+  "version": "1.0.0",
+  "description": "Romantic date proposal web application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'No build step needed'",
+    "vercel-build": "echo 'Vercel build complete'"
+  },
+  "keywords": [
+    "date",
+    "proposal",
+    "romantic"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "flatpickr": "^4.6.13",
+    "qrcode": "^1.5.4",
+    "serve": "^14.2.6",
+    "three": "^0.185.0"
+  }
+}

@@ -1,0 +1,507 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #1a0a14 0%, #2d102a 50%, #1a0a14 100%);
+    min-height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+#starsCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: auto;
+}
+
+.steps-overlay {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-window {
+    position: absolute;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    animation: modalIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 10;
+}
+
+.modal-window.hidden {
+    display: none;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5) translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-content {
+    padding: 40px;
+    text-align: center;
+    max-width: 700px;
+}
+
+h1 {
+    color: #ff6b6b;
+    margin-bottom: 30px;
+    font-size: 2.2rem;
+}
+
+button {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    color: white;
+    border: none;
+    padding: 15px 35px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Georgia', serif;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+/* Step 1 - Playful Proposal */
+.buttons-container {
+    position: relative;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+}
+
+.yes-button {
+    font-size: 1.5rem;
+    padding: 20px 50px;
+}
+
+.no-button {
+    position: absolute;
+    font-size: 1.1rem;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #6c757d, #adb5bd);
+    transition: all 0.1s ease;
+}
+
+/* Step 2 - Date Picker */
+.date-picker {
+    width: 100%;
+    padding: 18px;
+    border: 3px solid #ffb3b3;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    text-align: center;
+    font-family: 'Georgia', serif;
+    outline: none;
+}
+
+.date-picker:focus {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.2);
+}
+
+/* Step 3 - Analog Clock */
+.clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.clock {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fff0f5, #ffe4e9);
+    border: 10px solid #ff6b6b;
+    position: relative;
+    box-shadow: 0 15px 50px rgba(255, 107, 107, 0.35);
+    cursor: pointer;
+}
+
+.clock-face {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.clock-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.5);
+}
+
+.hour-hand, .minute-hand {
+    position: absolute;
+    transform-origin: bottom center;
+    border-radius: 12px;
+    background: linear-gradient(to top, #ff6b6b, #ff8e8e);
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+    transition: transform 0.1s ease;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto;
+}
+
+.hour-hand::before,
+.minute-hand::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 100%;
+    cursor: grab;
+    pointer-events: auto;
+}
+
+.hour-hand:active,
+.minute-hand:active {
+    cursor: grabbing;
+}
+
+.hour-hand {
+    width: 16px;
+    height: 110px;
+    bottom: 50%;
+    left: calc(50% - 8px);
+    z-index: 3;
+}
+
+.minute-hand {
+    width: 12px;
+    height: 140px;
+    bottom: 50%;
+    left: calc(50% - 6px);
+    z-index: 4;
+}
+
+.clock-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-135px) rotate(calc(var(--angle) * -1));
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff6b6b;
+}
+
+.clock-number::after {
+    content: var(--text);
+}
+
+.selected-time {
+    font-size: 2rem;
+    color: #ff6b6b;
+    font-weight: bold;
+    text-shadow: 0 2px 10px rgba(255, 107, 107, 0.2);
+}
+
+/* Step 4: Theme Picker */
+.theme-cards {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+}
+
+.theme-card {
+    background: #fff5f5;
+    border-radius: 16px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.theme-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    border-color: #ff6b6b;
+}
+
+.theme-image {
+    height: 110px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    background-size: cover;
+    background-position: center;
+}
+
+.theme-image.campus_coffee {
+    background: linear-gradient(135deg, #d4a373 0%, #a67c52 100%);
+}
+
+.theme-image.movie_night {
+    background: linear-gradient(135deg, #4a4e69 0%, #22223b 100%);
+}
+
+.theme-image.food_run {
+    background: linear-gradient(135deg, #ff8c42 0%, #e63946 100%);
+}
+
+.theme-image.late_night_walk {
+    background: linear-gradient(135deg, #2b2d42 0%, #8d99ae 100%);
+}
+
+.theme-card h3 {
+    color: #ff6b6b;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+}
+
+.theme-card p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Step 5 - Dietary Preferences */
+.dietary-options {
+    text-align: left;
+    margin-bottom: 25px;
+    background: #fff5f5;
+    padding: 25px;
+    border-radius: 14px;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    color: #444;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #ff6b6b;
+}
+
+.dietary-options h3 {
+    color: #ff6b6b;
+    margin-bottom: 12px;
+}
+
+.dietary-options input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    border: 3px solid #ffb3b3;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Georgia', serif;
+    outline: none;
+}
+
+.dietary-options input[type="text"]:focus {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.2);
+}
+
+/* Summary */
+#summary {
+    text-align: left;
+    margin-bottom: 25px;
+    padding: 25px;
+    background: #fff5f5;
+    border-radius: 14px;
+}
+
+#summary p {
+    margin: 12px 0;
+    color: #444;
+    font-size: 1.1rem;
+}
+
+#summary strong {
+    color: #ff6b6b;
+}
+
+/* QR Code & URL */
+#qrcode {
+    margin: 25px auto;
+    width: 260px;
+    height: 260px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+#url-display {
+    word-break: break-all;
+    margin: 20px 0;
+    padding: 18px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-family: monospace;
+    font-size: 1rem;
+    color: #333;
+}
+
+#copy-status {
+    color: #4caf50;
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 1.2rem;
+}
+
+/* Flatpickr Custom Styling - Teddy Bear Pink Theme */
+.flatpickr-calendar {
+    background: 
+        radial-gradient(circle at 10% 10%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(255, 218, 185, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #fff5f8 0%, #fffafb 100%);
+    border-radius: 24px;
+    box-shadow: 0 25px 70px rgba(255, 107, 107, 0.25);
+    border: 4px solid #ffccd5;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cute teddy bear decorations */
+.flatpickr-calendar::before,
+.flatpickr-calendar::after {
+    content: '🧸';
+    position: absolute;
+    font-size: 40px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.flatpickr-calendar::before {
+    top: 15px;
+    left: 15px;
+}
+
+.flatpickr-calendar::after {
+    bottom: 15px;
+    right: 15px;
+    transform: scaleX(-1);
+}
+
+.flatpickr-current-month {
+    color: #ff477e;
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(255, 71, 126, 0.1);
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    color: #ff477e;
+    fill: #ff477e;
+    z-index: 10;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+    color: #ff8fa3;
+    fill: #ff8fa3;
+}
+
+.flatpickr-day {
+    border-radius: 14px;
+    color: #ff477e;
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: all 0.25s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.flatpickr-day:hover:not(.disabled) {
+    background: linear-gradient(135deg, #ff6b9d, #ff8fa3);
+    color: white;
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(255, 71, 126, 0.4);
+}
+
+.flatpickr-day.selected {
+    background: linear-gradient(135deg, #ff477e, #ff8fa3);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255, 71, 126, 0.5);
+    transform: scale(1.1);
+}
+
+.flatpickr-day.today {
+    border: 3px solid #ff477e;
+    color: #ff477e;
+    background: rgba(255, 71, 126, 0.08);
+}
+
+.flatpickr-day.today:hover:not(.disabled) {
+    background: linear-gradient(135deg, #ff477e, #ff8fa3);
+    color: white;
+}
+
+.flatpickr-day.disabled {
+    color: #cccccc !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.flatpickr-day.disabled:hover {
+    background: none !important;
+    color: #cccccc !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.flatpickr-weekday {
+    color: #ff477e;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-shadow: 0 1px 2px rgba(255, 71, 126, 0.1);
+}
+
+.flatpickr-innerContainer {
+    position: relative;
+    z-index: 1;
+}
