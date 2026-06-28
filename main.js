@@ -296,14 +296,23 @@ function confirmAndSave() {
 
 function downloadDatePlan() {
     const card = document.getElementById('datePlanCard');
+    // Make sure it's visible and has layout
+    card.style.display = 'block';
+    card.style.opacity = '1';
+    card.style.position = 'relative';
+    
     html2canvas(card, {
-        scale: 2, // Higher scale for better quality
+        scale: 3,
         backgroundColor: '#fff5f5',
-        useCORS: true
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        imageTimeout: 0,
+        removeContainer: true
     }).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'perfect-date-plan.png';
-        link.href = canvas.toDataURL('image/png');
+        link.download = 'our-perfect-date-plan.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
     }).catch(err => {
         console.error('Failed to generate image:', err);
