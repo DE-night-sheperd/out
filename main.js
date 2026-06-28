@@ -372,13 +372,13 @@ function createStar() {
 
 function getRandomPinkColor() {
     const colors = [
+        '#ff477e',
         '#ff6b9d',
         '#ff8fa3',
         '#ffb3c1',
         '#ffccd5',
         '#fff0f3',
-        '#ff477e',
-        '#ff85a2'
+        '#ff2d6b'
     ];
     return colors[Math.floor(Math.random() * colors.length)];
 }
